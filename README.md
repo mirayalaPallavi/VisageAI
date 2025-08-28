@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Club Project
 
 A comprehensive microservices-based system for face detection, embedding generation, and similarity search, designed for club management and security applications.
@@ -418,3 +419,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ---
 
 **Built with ❤️ by the Club Project Team**
+=======
+# VisageAI
+>>>>>>> 951b467e1a95fa77b7f02656c2318aed21665177

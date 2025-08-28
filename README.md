@@ -418,7 +418,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**Built with ❤️ by the Club Project Team**
+**Built with ❤️ towards theProject **
 =======
 # VisageAI
 >>>>>>> 951b467e1a95fa77b7f02656c2318aed21665177

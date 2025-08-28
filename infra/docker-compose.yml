@@ -1,0 +1,207 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: club_project
+      POSTGRES_USER: club_user
+      POSTGRES_PASSWORD: club_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - club-network
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - club-network
+
+  # API Gateway
+  api-gateway:
+    build:
+      context: ../services/api-gateway
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - ENVIRONMENT=development
+      - LOG_LEVEL=DEBUG
+      - POSTGRES_HOST=postgres
+      - REDIS_HOST=redis
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - club-network
+
+  # Auth Service
+  auth:
+    build:
+      context: ../services/auth
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8001"
+    environment:
+      - ENVIRONMENT=development
+      - LOG_LEVEL=DEBUG
+      - POSTGRES_HOST=postgres
+      - REDIS_HOST=redis
+      - JWT_SECRET=dev_jwt_secret
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - club-network
+
+  # Template Service
+  template-service:
+    build:
+      context: ../services/template-service
+      dockerfile: Dockerfile
+    ports:
+      - "8002:8002"
+    environment:
+      - ENVIRONMENT=development
+      - LOG_LEVEL=DEBUG
+      - DATABASE_URL=postgresql://club_user:club_password@postgres:5432/club_project
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - club-network
+
+  # Image Pipeline
+  image-pipeline:
+    build:
+      context: ../services/image-pipeline
+      dockerfile: Dockerfile
+    ports:
+      - "8003:8003"
+    environment:
+      - ENVIRONMENT=development
+      - LOG_LEVEL=DEBUG
+      - REDIS_URL=redis://redis:6379/0
+      - EMBEDDING_SERVICE_URL=http://embedding-service:8006
+    depends_on:
+      - redis
+      - embedding-service
+    networks:
+      - club-network
+
+  # Video Pipeline
+  video-pipeline:
+    build:
+      context: ../services/video-pipeline
+      dockerfile: Dockerfile
+    ports:
+      - "8004:8004"
+    environment:
+      - ENVIRONMENT=development
+      - LOG_LEVEL=DEBUG
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/1
+      - CELERY_RESULT_BACKEND=redis://redis:6379/2
+    depends_on:
+      - redis
+    networks:
+      - club-network
+
+  # Embedding Service
+  embedding-service:
+    build:
+      context: ../services/embedding-service
+      dockerfile: Dockerfile
+    ports:
+      - "8006:8006"
+    environment:
+      - ENVIRONMENT=development
+      - LOG_LEVEL=DEBUG
+      - MODEL_PATH=/app/models
+    volumes:
+      - embedding_models:/app/models
+    networks:
+      - club-network
+
+  # Matching Service
+  matching-service:
+    build:
+      context: ../services/matching-service
+      dockerfile: Dockerfile
+    ports:
+      - "8007:8007"
+    environment:
+      - ENVIRONMENT=development
+      - LOG_LEVEL=DEBUG
+      - MILVUS_HOST=milvus-standalone
+      - MILVUS_PORT=19530
+    depends_on:
+      - milvus-standalone
+    networks:
+      - club-network
+
+  # Milvus Vector Database
+  milvus-standalone:
+    image: milvusdb/milvus:v2.3.3
+    command: ["milvus", "run", "standalone"]
+    environment:
+      ETCD_ENDPOINTS: etcd:2379
+      MINIO_ADDRESS: minio:9000
+    volumes:
+      - milvus_data:/var/lib/milvus
+    ports:
+      - "19530:19530"
+      - "9091:9091"
+    depends_on:
+      - etcd
+      - minio
+    networks:
+      - club-network
+
+  # Etcd for Milvus
+  etcd:
+    image: quay.io/coreos/etcd:v3.5.5
+    environment:
+      - ETCD_AUTO_COMPACTION_MODE=revision
+      - ETCD_AUTO_COMPACTION_RETENTION=1000
+      - ETCD_QUOTA_BACKEND_BYTES=4294967296
+    volumes:
+      - etcd_data:/etcd
+    networks:
+      - club-network
+
+  # MinIO for Milvus
+  minio:
+    image: minio/minio:RELEASE.2023-03-20T20-16-18Z
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    command: minio server /data --console-address ":9001"
+    volumes:
+      - minio_data:/data
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    networks:
+      - club-network
+
+volumes:
+  postgres_data:
+  redis_data:
+  embedding_models:
+  milvus_data:
+  etcd_data:
+  minio_data:
+
+networks:
+  club-network:
+    driver: bridge

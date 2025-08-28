@@ -1,0 +1,16 @@
+apiVersion: v2
+name: api-gateway
+description: API Gateway service for Club Project
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+keywords:
+  - api-gateway
+  - microservices
+  - club-project
+home: https://github.com/club-project/api-gateway
+sources:
+  - https://github.com/club-project/api-gateway
+maintainers:
+  - name: Club Project Team
+    email: team@club-project.com

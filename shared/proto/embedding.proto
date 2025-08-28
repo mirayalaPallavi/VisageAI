@@ -1,0 +1,290 @@
+syntax = "proto3";
+
+package club_project.embedding;
+
+option go_package = "github.com/club-project/proto/embedding";
+option java_package = "com.clubproject.proto.embedding";
+option java_multiple_files = true;
+
+// Service for generating face embeddings
+service EmbeddingService {
+  // Generate embedding for a single image
+  rpc GenerateEmbedding(GenerateEmbeddingRequest) returns (GenerateEmbeddingResponse);
+  
+  // Generate embeddings for multiple images
+  rpc GenerateBatchEmbeddings(GenerateBatchEmbeddingsRequest) returns (GenerateBatchEmbeddingsResponse);
+  
+  // Validate embedding quality
+  rpc ValidateEmbedding(ValidateEmbeddingRequest) returns (ValidateEmbeddingResponse);
+  
+  // Get model information
+  rpc GetModelInfo(GetModelInfoRequest) returns (GetModelInfoResponse);
+}
+
+// Request to generate embedding for a single image
+message GenerateEmbeddingRequest {
+  // Image data (base64 encoded or raw bytes)
+  oneof image_data {
+    string image_base64 = 1;
+    bytes image_bytes = 2;
+  }
+  
+  // Image format (JPEG, PNG, etc.)
+  string image_format = 3;
+  
+  // Target embedding dimension
+  int32 target_dimension = 4;
+  
+  // Additional processing options
+  ProcessingOptions options = 5;
+}
+
+// Response with generated embedding
+message GenerateEmbeddingResponse {
+  // Generated embedding vector
+  repeated float embedding = 1;
+  
+  // Embedding dimension
+  int32 dimension = 2;
+  
+  // Processing metadata
+  ProcessingMetadata metadata = 3;
+  
+  // Error information if processing failed
+  ErrorInfo error = 4;
+}
+
+// Request to generate embeddings for multiple images
+message GenerateBatchEmbeddingsRequest {
+  // List of images to process
+  repeated ImageData images = 1;
+  
+  // Target embedding dimension
+  int32 target_dimension = 2;
+  
+  // Additional processing options
+  ProcessingOptions options = 3;
+}
+
+// Response with multiple embeddings
+message GenerateBatchEmbeddingsResponse {
+  // List of generated embeddings
+  repeated EmbeddingResult results = 1;
+  
+  // Batch processing metadata
+  BatchProcessingMetadata metadata = 2;
+}
+
+// Individual embedding result
+message EmbeddingResult {
+  // Image index in the batch
+  int32 image_index = 1;
+  
+  // Generated embedding vector
+  repeated float embedding = 2;
+  
+  // Embedding dimension
+  int32 dimension = 3;
+  
+  // Processing metadata
+  ProcessingMetadata metadata = 4;
+  
+  // Error information if processing failed
+  ErrorInfo error = 5;
+}
+
+// Image data for batch processing
+message ImageData {
+  // Image data (base64 encoded or raw bytes)
+  oneof image_data {
+    string image_base64 = 1;
+    bytes image_bytes = 2;
+  }
+  
+  // Image format
+  string image_format = 3;
+  
+  // Optional image identifier
+  string image_id = 4;
+}
+
+// Processing options for embedding generation
+message ProcessingOptions {
+  // Whether to normalize the embedding
+  bool normalize = 1;
+  
+  // Quality threshold for face detection
+  float quality_threshold = 2;
+  
+  // Target image size for preprocessing
+  ImageSize target_size = 3;
+  
+  // Face detection confidence threshold
+  float detection_confidence = 4;
+}
+
+// Target image size
+message ImageSize {
+  int32 width = 1;
+  int32 height = 2;
+}
+
+// Processing metadata
+message ProcessingMetadata {
+  // Processing time in milliseconds
+  int64 processing_time_ms = 1;
+  
+  // Face detection results
+  repeated FaceDetectionResult face_detections = 2;
+  
+  // Image quality metrics
+  ImageQualityMetrics quality_metrics = 3;
+  
+  // Model version used
+  string model_version = 4;
+}
+
+// Face detection result
+message FaceDetectionResult {
+  // Bounding box coordinates
+  BoundingBox bbox = 1;
+  
+  // Detection confidence
+  float confidence = 2;
+  
+  // Face quality score
+  float quality_score = 3;
+}
+
+// Bounding box coordinates
+message BoundingBox {
+  float x = 1;
+  float y = 2;
+  float width = 3;
+  float height = 4;
+}
+
+// Image quality metrics
+message ImageQualityMetrics {
+  // Brightness score (0-100)
+  float brightness = 1;
+  
+  // Contrast score (0-100)
+  float contrast = 2;
+  
+  // Sharpness score (0-100)
+  float sharpness = 3;
+  
+  // Overall quality score (0-100)
+  float overall_score = 4;
+}
+
+// Batch processing metadata
+message BatchProcessingMetadata {
+  // Total number of images processed
+  int32 total_images = 1;
+  
+  // Number of successful embeddings
+  int32 successful_embeddings = 2;
+  
+  // Number of failed embeddings
+  int32 failed_embeddings = 3;
+  
+  // Total processing time in milliseconds
+  int64 total_processing_time_ms = 4;
+  
+  // Average processing time per image
+  float avg_processing_time_ms = 5;
+}
+
+// Request to validate embedding quality
+message ValidateEmbeddingRequest {
+  // Embedding vector to validate
+  repeated float embedding = 1;
+  
+  // Expected dimension
+  int32 expected_dimension = 2;
+}
+
+// Response with validation results
+message ValidateEmbeddingResponse {
+  // Whether the embedding is valid
+  bool is_valid = 1;
+  
+  // Validation score (0-100)
+  float validation_score = 2;
+  
+  // Validation details
+  ValidationDetails details = 3;
+  
+  // Error information if validation failed
+  ErrorInfo error = 4;
+}
+
+// Validation details
+message ValidationDetails {
+  // Actual embedding dimension
+  int32 actual_dimension = 1;
+  
+  // Whether the embedding contains NaN values
+  bool has_nan = 2;
+  
+  // Whether the embedding contains infinite values
+  bool has_inf = 3;
+  
+  // L2 norm of the embedding
+  float l2_norm = 4;
+  
+  // Mean value of the embedding
+  float mean = 5;
+  
+  // Standard deviation of the embedding
+  float std = 6;
+  
+  // List of validation issues found
+  repeated string issues = 7;
+  
+  // List of validation warnings
+  repeated string warnings = 8;
+}
+
+// Request to get model information
+message GetModelInfoRequest {
+  // No parameters needed
+}
+
+// Response with model information
+message GetModelInfoResponse {
+  // Model type/architecture
+  string model_type = 1;
+  
+  // Model version
+  string model_version = 2;
+  
+  // Embedding dimension
+  int32 embedding_dimension = 3;
+  
+  // Model parameters count
+  int64 total_parameters = 4;
+  
+  // Whether the model is loaded
+  bool is_loaded = 5;
+  
+  // Model loading status
+  string loading_status = 6;
+}
+
+// Error information
+message ErrorInfo {
+  // Error code
+  string error_code = 1;
+  
+  // Error message
+  string error_message = 2;
+  
+  // Error details
+  string error_details = 3;
+  
+  // Error timestamp
+  string timestamp = 4;
+}

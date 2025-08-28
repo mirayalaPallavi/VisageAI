@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: club-project
+  labels:
+    name: club-project
+    app: club-project
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: club-project-monitoring
+  labels:
+    name: club-project-monitoring
+    app: club-project

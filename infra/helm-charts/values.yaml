@@ -1,0 +1,55 @@
+# Common values for all Helm charts
+global:
+  environment: production
+  imageRegistry: club-project
+  imageTag: latest
+  
+  # Database configuration
+  postgres:
+    host: postgres
+    port: 5432
+    database: club_project
+    user: club_user
+    password: ""
+    
+  # Redis configuration
+  redis:
+    host: redis
+    port: 6379
+    database: 0
+    
+  # Monitoring
+  monitoring:
+    enabled: true
+    prometheus:
+      enabled: true
+    grafana:
+      enabled: true
+      
+  # Security
+  security:
+    jwtSecret: ""
+    cors:
+      allowedOrigins: ["https://club-project.com"]
+      allowedMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+      
+  # Resources
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "250m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+      
+  # Replicas
+  replicas: 2
+  
+  # Health checks
+  healthChecks:
+    livenessProbe:
+      initialDelaySeconds: 30
+      periodSeconds: 10
+    readinessProbe:
+      initialDelaySeconds: 5
+      periodSeconds: 5

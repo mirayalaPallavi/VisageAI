@@ -1,0 +1,16 @@
+apiVersion: v2
+name: template-service
+description: Template Service for Club Project
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+keywords:
+  - template-service
+  - microservices
+  - club-project
+home: https://github.com/club-project/template-service
+sources:
+  - https://github.com/club-project/template-service
+maintainers:
+  - name: Club Project Team
+    email: team@club-project.com

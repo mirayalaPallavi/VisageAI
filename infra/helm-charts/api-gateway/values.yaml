@@ -1,0 +1,63 @@
+# API Gateway specific values
+apiGateway:
+  name: api-gateway
+  port: 8000
+  
+  # Service configuration
+  service:
+    type: ClusterIP
+    port: 80
+    targetPort: 8000
+    
+  # Ingress configuration
+  ingress:
+    enabled: true
+    className: nginx
+    annotations:
+      nginx.ingress.kubernetes.io/rewrite-target: /
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    hosts:
+      - host: api.club-project.com
+        paths:
+          - path: /
+            pathType: Prefix
+    tls:
+      - secretName: api-gateway-tls
+        hosts:
+          - api.club-project.com
+          
+  # Environment variables
+  env:
+    - name: ENVIRONMENT
+      value: "production"
+    - name: LOG_LEVEL
+      value: "INFO"
+    - name: PORT
+      value: "8000"
+      
+  # Resources
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "250m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+      
+  # Replicas
+  replicas: 2
+  
+  # Health checks
+  healthChecks:
+    livenessProbe:
+      httpGet:
+        path: /health
+        port: 8000
+      initialDelaySeconds: 30
+      periodSeconds: 10
+    readinessProbe:
+      httpGet:
+        path: /ready
+        port: 8000
+      initialDelaySeconds: 5
+      periodSeconds: 5

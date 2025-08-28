@@ -1,0 +1,281 @@
+openapi: 3.0.3
+info:
+  title: Club Project API
+  description: API specification for Club Project microservices
+  version: 1.0.0
+  contact:
+    name: Club Project Team
+    email: team@club-project.com
+
+servers:
+  - url: https://api.club-project.com
+    description: Production server
+  - url: http://localhost:8000
+    description: Local development server
+
+paths:
+  /health:
+    get:
+      summary: Health check
+      description: Check if the API gateway is healthy
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "healthy"
+                  service:
+                    type: string
+                    example: "api-gateway"
+
+  /ready:
+    get:
+      summary: Readiness check
+      description: Check if all services are ready
+      responses:
+        '200':
+          description: All services are ready
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "ready"
+                  services:
+                    type: object
+                    additionalProperties:
+                      type: string
+
+  /auth/{path:path}:
+    get:
+      summary: Auth service proxy
+      description: Proxy GET requests to auth service
+      parameters:
+        - name: path
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response from auth service
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal server error
+
+    post:
+      summary: Auth service proxy
+      description: Proxy POST requests to auth service
+      parameters:
+        - name: path
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response from auth service
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+
+  /templates/{path:path}:
+    get:
+      summary: Template service proxy
+      description: Proxy GET requests to template service
+      parameters:
+        - name: path
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response from template service
+        '404':
+          description: Template not found
+        '500':
+          description: Internal server error
+
+    post:
+      summary: Template service proxy
+      description: Proxy POST requests to template service
+      parameters:
+        - name: path
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '201':
+          description: Template created successfully
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+
+    put:
+      summary: Template service proxy
+      description: Proxy PUT requests to template service
+      parameters:
+        - name: path
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Template updated successfully
+        '404':
+          description: Template not found
+        '500':
+          description: Internal server error
+
+    delete:
+      summary: Template service proxy
+      description: Proxy DELETE requests to template service
+      parameters:
+        - name: path
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Template deleted successfully
+        '404':
+          description: Template not found
+        '500':
+          description: Internal server error
+
+  /images/{path:path}:
+    get:
+      summary: Image pipeline proxy
+      description: Proxy GET requests to image pipeline service
+      parameters:
+        - name: path
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response from image pipeline service
+        '500':
+          description: Internal server error
+
+    post:
+      summary: Image pipeline proxy
+      description: Proxy POST requests to image pipeline service
+      parameters:
+        - name: path
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response from image pipeline service
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+
+  /videos/{path:path}:
+    get:
+      summary: Video pipeline proxy
+      description: Proxy GET requests to video pipeline service
+      parameters:
+        - name: path
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response from video pipeline service
+        '500':
+          description: Internal server error
+
+    post:
+      summary: Video pipeline proxy
+      description: Proxy POST requests to video pipeline service
+      parameters:
+        - name: path
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response from video pipeline service
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+
+components:
+  schemas:
+    Error:
+      type: object
+      properties:
+        detail:
+          type: string
+          description: Error message
+        status_code:
+          type: integer
+          description: HTTP status code
+
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [healthy, unhealthy]
+        service:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+
+    ReadyResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [ready, not_ready]
+        services:
+          type: object
+          additionalProperties:
+            type: string
+            enum: [healthy, unhealthy, unreachable]
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+security:
+  - BearerAuth: []
+
+tags:
+  - name: Health
+    description: Health and readiness checks
+  - name: Auth
+    description: Authentication and authorization
+  - name: Templates
+    description: Template management
+  - name: Images
+    description: Image processing
+  - name: Videos
+    description: Video processing

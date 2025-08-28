@@ -1,7 +1,10 @@
 <<<<<<< HEAD
-# Club Project
+# VisageAI 🚀  
+AI-Powered Face Recognition & Verification Platform  
 
-A comprehensive microservices-based system for face detection, embedding generation, and similarity search, designed for club management and security applications.
+
+VisageAI is a **scalable, microservices-based platform** for **face recognition and verification** using **images and videos**.  
+It offers **real-time face detection, embedding generation, and secure template management**, built for **security, authentication, and advanced analytics**.
 
 ## 🏗️ Architecture Overview
 
@@ -29,6 +32,14 @@ The Club Project is built using a microservices architecture with the following 
                     │   (Port 8007)   │
                     └─────────────────┘
 ```
+
+## ✅ Features
+- 🖼️ Single-Image & Video Pipelines
+- 🔐 Secure Template Management (AES-GCM encryption)
+- 🔍 High-Speed Face Matching (FAISS / Milvus)
+- ⚡ Microservices + API Gateway
+- 🛠 Docker & Kubernetes for Scalability
+- 📊 Monitoring & Observability with Prometheus + Grafana
 
 ## 🚀 Services
 
@@ -119,12 +130,13 @@ The Club Project is built using a microservices architecture with the following 
 - Redis 7+
 - Kubernetes cluster (for production)
 
-## 🚀 Quick Start
+```
 
-### 1. Clone the Repository
+## 🚀 Quick Start
+### 1️⃣ Clone the Repository
 ```bash
-git clone https://github.com/your-org/club-project.git
-cd club-project
+git clone https://github.com/mirayalaPallavi/VisageAI.git
+cd VisageAI
 ```
 
 ### 2. Environment Setup
